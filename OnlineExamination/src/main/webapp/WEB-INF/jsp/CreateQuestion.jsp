@@ -76,7 +76,7 @@ document.getElementById('time').value=timeInSec;
                     	<%--  <form:option value="1" label="Maths"/>
                     	  <form:option value="2" label="Power System"/>
                     	  <form:option value="3" label="Digital Electronice"/> --%>
-                    	   <form:option value="1" label="Electrical"/>
+                    	   <form:option value="1" label="Computer Science"/>
                      </form:select>
                 </tr>
                 <tr>

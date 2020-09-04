@@ -1,1 +1,1 @@
-{"questionId":24,"questionDesc":"Test 2","subjectId":1,"questionType":"Text","options":[",",",",",",","],"answers":["2"],"marks":1.0,"time":120}
+{"questionId":24,"questionDesc":"What is blueprint entity used for creating Objects in any programming?","subjectId":1,"questionType":"Multiple","options":["Method,","Variable,","Interface,","Class,"],"answers":["Class"],"marks":2.0,"time":60}

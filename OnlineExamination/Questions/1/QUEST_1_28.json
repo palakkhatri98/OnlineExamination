@@ -1,1 +1,1 @@
-{"questionId":28,"questionDesc":"Tesat 5","subjectId":1,"questionType":"Text","options":[",",",",",",","],"answers":["5"],"marks":1.0,"time":1}
+{"questionId":28,"questionDesc":"Which OOPs principle talks about \"Child class obtaining the properties and behaviour of Parent class\"","subjectId":1,"questionType":"Multiple","options":["Abstraction,","Inheritance,","Encapsulation,","Polymorphism,"],"answers":["Inheritance"],"marks":2.5,"time":15}

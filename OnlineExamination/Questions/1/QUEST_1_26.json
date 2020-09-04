@@ -1,1 +1,1 @@
-{"questionId":26,"questionDesc":"Test 3","subjectId":1,"questionType":"Text","options":[",",",",",",","],"answers":["3"],"marks":1.0,"time":1}
+{"questionId":26,"questionDesc":"Which OOP principle says of \"Hiding the actual implementation\"","subjectId":1,"questionType":"Multiple","options":["Abstraction,","Inheritance,","Encapsulation,","Polymorphism,"],"answers":["Abstraction"],"marks":2.5,"time":15}

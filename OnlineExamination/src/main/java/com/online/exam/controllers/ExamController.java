@@ -1,11 +1,13 @@
 package com.online.exam.controllers;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,9 @@ import org.springframework.web.servlet.ModelAndView;
 import com.online.exam.beans.Exam;
 import com.online.exam.beans.ExamResult;
 import com.online.exam.beans.Question;
+import com.online.exam.beans.User;
+import com.online.exam.service.DBUtility;
+import com.online.exam.service.UserDaoService;
 import com.online.exam.utility.ExamJSONUtility;
 
 
@@ -47,6 +52,14 @@ public class ExamController {
 	    public String aboutPage(ModelMap model){
 		 System.out.println("Request to About Page");
 	        return "about";
+	    }
+	 
+	 @RequestMapping(value="/createUser", method = RequestMethod.GET)
+	    public ModelAndView createUser(ModelMap model){
+		 System.out.println("Request to Create User page");
+		 User user = new User();
+		 user.setRole("Admin");
+		 return new ModelAndView("CreateUser" , "user", user);
 	    }
 	 
 	 @RequestMapping(value="/createQuestion", method = RequestMethod.GET)
@@ -84,13 +97,109 @@ public class ExamController {
 	     return new ModelAndView("ListOfExams" , "exams", exams);
 	    }
 	 
+	 @RequestMapping(value="/resetPassword", method = RequestMethod.GET)
+	    public ModelAndView resetPassword(ModelMap model,HttpServletRequest request){
+		 //subject hardcoded
+		 System.out.println("Request to reset password");
+		 User user = (User) request.getSession().getAttribute("USER");
+		 user.setPassword("");
+	     return new ModelAndView("ResetPassword" , "user", user);
+	    }
 	 
+	 
+	 @RequestMapping(value = "/addUser", method = RequestMethod.POST)
+	    public ModelAndView addUser(@Valid @ModelAttribute("user")User user, 
+	    		BindingResult result, ModelMap model) {
+		 String message = "";
+		 if (result.hasErrors()) {
+			 ModelAndView modelView = new ModelAndView("error" , "message", "Error occured while saving user");
+			 return modelView;
+		 }
+		 System.out.println("Request to Save a User");
+		
+		 if((user.getUsername() !=null && !user.getUsername().trim().isEmpty())
+				 && (user.getPassword() !=null && !user.getPassword().trim().isEmpty())
+				 && (user.getEmail() != null && !user.getEmail().trim().isEmpty())) {
+			 
+			User existingUser = UserDaoService.getUserByName(user.getUsername());
+			 
+			if(existingUser != null 
+					&& ((existingUser.getUsername() !=null && existingUser.getUsername().equals(user.getUsername()))
+							|| (existingUser.getEmail()!=null && existingUser.getEmail().equals(user.getEmail())))) {
+				 message = "User with given details already exists !!";
+				 System.out.println(message);
+				 ModelAndView modelView = new ModelAndView("CreateUser" , "message", message);
+				 return modelView;
+			}
+			 user.executeInsert();
+			 message = "User Added successfully";
+			 System.out.println(message);
+			 ModelAndView modelView = new ModelAndView("ExaminerHome" , "message", message);
+			 return modelView;
+			 
+		 }else {
+			 message = "User can not be saved with blank fields. All fields are mandatory !!";
+			 System.out.println(message);
+			 ModelAndView modelView = new ModelAndView("CreateUser" , "message", message);
+			 return modelView;
+		 }
+		 
+		
+	 }
+	 
+	 @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
+	    public ModelAndView updatePassowrd(@Valid @ModelAttribute("user")User user, 
+	    		BindingResult result, ModelMap model) {
+		 String message = "";
+		 if (result.hasErrors()) {
+			 ModelAndView modelView = new ModelAndView("error" , "message", "Error occured while saving user");
+			 return modelView;
+		 }
+		 System.out.println("Request to Update password");
+		
+		 if((user.getUsername() !=null && !user.getUsername().trim().isEmpty())
+				 && (user.getPassword() !=null && !user.getPassword().trim().isEmpty())) {
+			 
+			User existingUser = UserDaoService.getUserByName(user.getUsername());
+			 
+			if(!user.getNewPassword().equals(user.getConfirmNewPassword())) {
+				 message = "Newly added Password did not match. Please re-try";
+				 System.out.println(message);
+				 ModelAndView modelView = new ModelAndView("ResetPassword" , "message", message);
+				 return modelView;
+			}else if(existingUser != null 
+					&& (existingUser.getUsername() !=null && existingUser.getUsername().equals(user.getUsername())
+							&& existingUser.getPassword()!=null 
+							&& !existingUser.getPassword().equals(
+									Base64.getEncoder().encodeToString(user.getPassword().getBytes())))) {
+				 message = "Incorrect Password!!";
+				 System.out.println(message);
+				 ModelAndView modelView = new ModelAndView("ResetPassword" , "message", message);
+				 return modelView;
+			}
+			existingUser.setPassword(user.getConfirmNewPassword());
+			existingUser.executeUpdate();
+			 message = "Password updated successfully";
+			 System.out.println(message);
+			 ModelAndView modelView = new ModelAndView("ExaminerHome" , "message", message);
+			 return modelView;
+			 
+		 }else {
+			 message = "User can not be updated with blank fields. All fields are mandatory !!";
+			 System.out.println(message);
+			 ModelAndView modelView = new ModelAndView("ResetPassword" , "message", message);
+			 return modelView;
+		 }
+		 
+		
+	 }
 	 
 	 @RequestMapping(value = "/addQuestion", method = RequestMethod.POST)
-	    public String addQuestion(@Valid @ModelAttribute("question")Question question, 
+	    public ModelAndView addQuestion(@Valid @ModelAttribute("question")Question question, 
 	      BindingResult result, ModelMap model) {
 	        if (result.hasErrors()) {
-	            return "error";
+	        	 ModelAndView modelView = new ModelAndView("error" , "message", "Error occured");
+				 return modelView;
 	        }
 	      System.out.println("Request to Submit a question");
 	      question.setQuestionId(ExamJSONUtility.getQuestionId());
@@ -104,16 +213,18 @@ public class ExamController {
 	      System.out.println(question.getMarks());
 	      System.out.println(question.getTime());
 	      ExamJSONUtility.writeQuestionObjectToFile(question);
-	      System.out.println("Question created successfully");
-	        return "ExaminerHome";
+	      question.executeInsert();
+	      ModelAndView modelView = new ModelAndView("ExaminerHome" , "message", "Question successfully added to Set");
+			 return modelView;
 	    }
 	 
 	 
 	 @RequestMapping(value = "/addExam", method = RequestMethod.POST)
-	    public String addExam(@Valid @ModelAttribute("exam")Exam exam, 
+	    public ModelAndView addExam(@Valid @ModelAttribute("exam")Exam exam, 
 	      BindingResult result, ModelMap model) {
 	        if (result.hasErrors()) {
-	            return "error";
+	        	 ModelAndView modelView = new ModelAndView("error" , "message", "Error occured");
+				 return modelView;
 	        }
 	      exam.setExamId(exam.getExamName().replace(" ", "_")+"_"+ExamJSONUtility.getExamId());
 	      exam.setCreateDt(new Date(System.currentTimeMillis()));
@@ -121,8 +232,10 @@ public class ExamController {
 	      System.out.println(exam.getTotalMarks());
 	      System.out.println(exam.getTotalTime());
 	      ExamJSONUtility.writeExamObjectToFile(exam);
+	      exam.executeInsert();
 	      System.out.println("Exam created successfully");
-	        return "ExaminerHome";
+	      ModelAndView modelView = new ModelAndView("ExaminerHome" , "message", "Exam created successfully");
+			 return modelView;
 	    }
 	 
 	 
@@ -164,6 +277,7 @@ public class ExamController {
 	     examResult.setNumberOfAttemptedQuest(examResult.getQuestAnsMap().size());
 	     ExamJSONUtility.processResult(examResult);
 	      ExamJSONUtility.writeResultObjectToFile(examResult);
+	      examResult.executeInsert();
 	      System.out.println("Result Generated successfully");
 	      model.addAttribute("message", "Exam Completed Successfully");
 	        return "Login";

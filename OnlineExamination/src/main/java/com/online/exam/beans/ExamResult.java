@@ -1,7 +1,12 @@
 package com.online.exam.beans;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
+
+import com.online.exam.service.DBUtility;
 
 public class ExamResult {
 
@@ -86,4 +91,28 @@ public class ExamResult {
 		this.subjectId = subjectId;
 	}
 	
+	public String gtInsertSQL() {
+		return "INSERT INTO RESULT (USER_ID,EXAM_ID,MARKS_OBTAINED,QUEST_ATTEMPT,CORRECT_ATTEMPT) VALUES "
+				+"("
+				+enrollmentId+","+examId+","+marksObtained+","+numberOfAttemptedQuest+","+numberOfCorrectAns
+				+");";
+	}
+	
+	public void executeInsert() {
+		Connection conn = DBUtility.getConnection();
+		Statement stmt = null;
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(gtInsertSQL());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			if(stmt != null)
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
 }

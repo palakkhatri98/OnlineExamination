@@ -20,7 +20,7 @@ body {background-color: powderblue;}
 
 <body>
 <div id="header">
-<a href="/Login" style="float: left;"><img src="sgsits.png"></a>
+<a href="/Login" style="float: left;"><img src="logo.png"></a>
 <a href="/About" style="float: right;" title="About portal"><img src="about.png" style="height:60px;width: 60px;"></a>
 </div>
 <h3>Welcome !! To Examination portal.</h3>

@@ -1,7 +1,12 @@
 package com.online.exam.beans;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.online.exam.service.DBUtility;
 
 public class Question {
 
@@ -94,5 +99,29 @@ public class Question {
 		this.time = time;
 	}
 	
+	public String gtInsertSQL() {
+		return "INSERT INTO QUESTION (QUESTION,QUESTION_TYPE,OPTIONS,ANSWER,TIME_ALLOTED,MARKS,SUBJECT_ID) VALUES "
+				+"("
+				+"'"+questionDesc+"','"+questionType+"','"+options+"','"+answers+"',"+time+","+marks+","+subjectId
+				+");";
+	}
+	
+	public void executeInsert() {
+		Connection conn = DBUtility.getConnection();
+		Statement stmt = null;
+		try {
+			stmt = conn.createStatement();
+			stmt.execute(gtInsertSQL());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			if(stmt != null)
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		}
+	}
 	
 }

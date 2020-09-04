@@ -28,31 +28,20 @@ td {
 }
 </style>
 
-</style>
-
+<script type="text/javascript">
+</script>
 </head>
 
 <body>
 <jsp:include page="header.jsp"></jsp:include>
-    <h3>Welcome !! To the Examiner portal.</h3>
+    <h3>Error Occured</h3>
     
-    <div align="center" style="margin-top:50">
-    <table>
-    <tr><th>Sr. No</th> <th>Exam Code</th> <th>Number Of Students Appeared</th></tr>
-    <tr align="center">
-    
-    <c:forEach items="${examResults}" var="result" varStatus="status">
-		<tr>
-			<td>${status.index+1}</td>
-			<td><a href="/getResultForExam?examId=${result.key}">${result.key}</a></td>
-			<td>${result.value}</td>
-		</tr>
-	</c:forEach>
-     </tr>
-    </table>
-    </div>
+    <h4 style="color:red;">${message}</h4>
+   
+   
     <jsp:include page="footer.jsp"></jsp:include>
 </body>
+
 
 
 </html>
